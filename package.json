@@ -1,14 +1,12 @@
 {
   "name": "node-basic-api-server",
-  "version": "1.0.0",
-  "description": "",
+  "engines": {
+    "node": "16.13.1"
+  },
   "main": ".eslintrc.js",
   "scripts": {
     "server": "nodemon src/main.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@types/node": "^17.0.10",
     "eslint": "^8.7.0",
