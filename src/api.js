@@ -7,20 +7,6 @@
  * @property {string} content
  */
 
-/** @type {Post[]} */
-const posts = [
-  {
-    id: 'first_post',
-    title: 'First post!',
-    content: 'Hi! This is my first post.',
-  },
-  {
-    id: 'second_post',
-    title: 'Second post...',
-    content: 'Oh yeah!',
-  },
-];
-
 /**
  * @typedef APIResponse
  * @property {number} statusCode
@@ -34,6 +20,25 @@ const posts = [
  * @property {(matches: string[], body: Object.<string, *> | undefined) => Promise<APIResponse>} callback
  */
 
+const fs = require('fs');
+
+const DB_FILENAME = 'database.json';
+const ENCODING = 'utf-8';
+
+/** @returns {Promise<Post[]>} */
+async function getPosts() {
+  const json = await fs.promises.readFile(DB_FILENAME, ENCODING);
+  return JSON.parse(json).posts;
+}
+
+/** @param {Post[]} posts */
+function savePosts(posts) {
+  const content = {
+    posts,
+  };
+  return fs.promises.writeFile(DB_FILENAME, JSON.stringify(content), ENCODING);
+}
+
 /** @type {Route[]} */
 const routes = [
   {
@@ -41,7 +46,7 @@ const routes = [
     method: 'GET',
     callback: async () => ({
       statusCode: 200,
-      body: posts,
+      body: await getPosts(),
     }),
   },
 
@@ -57,6 +62,7 @@ const routes = [
         };
       }
 
+      const posts = await getPosts();
       const post = posts.find((_post) => _post.id === postId);
 
       if (!post) {
@@ -93,7 +99,9 @@ const routes = [
         content: body.content,
       };
 
+      const posts = await getPosts();
       posts.push(newPost);
+      savePosts(posts);
 
       return {
         statusCode: 200,
